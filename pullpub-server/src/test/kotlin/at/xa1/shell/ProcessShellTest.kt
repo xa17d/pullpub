@@ -13,9 +13,9 @@ class ProcessShellTest {
 
     @Test
     fun `echo returns TEST`() = runBlockingTest {
-        val result = instance.run("echo", "TEST")
+        val result = instance.run("echo", "HELLO TEST")
         assertEquals(0, result.exitCode)
-        assertEquals("TEST", result.output.trim())
+        assertEquals("HELLO TEST", result.output.trim())
     }
 
     @Test

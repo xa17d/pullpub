@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit
 
 class ProcessShell(
     private val workingDirectory: File
-) {
-    suspend fun run(vararg command: String): ShellResult {
+): Shell {
+    override suspend fun run(vararg command: String): ShellResult {
         val builder = ProcessBuilder(*command).apply {
             redirectErrorStream(true)
             directory(workingDirectory)
