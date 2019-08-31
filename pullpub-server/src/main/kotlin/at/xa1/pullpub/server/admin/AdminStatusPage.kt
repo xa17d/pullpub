@@ -46,12 +46,19 @@ fun HTML.adminStatusPage(logRepository: EventLogRepository, activeCommit: Commit
                 raw(
                     """
                     function pull() {
+                        var buttonPull = document.getElementById("buttonPull")
+                        buttonPull.innerText = "pulling...";
+                        buttonPull.disabled = true;
                         var xhttp = new XMLHttpRequest();
                         xhttp.onreadystatechange = function() {
                             if (this.readyState == 4) {
                                 if (this.status == 200) {
-                                    // success    
+                                    buttonPull.innerText = "pull: success";    
+                                } else {
+                                    buttonPull.innerText = "pull: error";
                                 }
+                                
+                                buttonPull.disabled = false;
                                 location.reload();
                             }
                         };
@@ -69,6 +76,7 @@ fun HTML.adminStatusPage(logRepository: EventLogRepository, activeCommit: Commit
         h1 { +"pullpub" }
 
         button {
+            id = "buttonPull"
             onClick = "pull()"
             +"pull!"
         }
