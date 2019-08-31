@@ -1,21 +1,28 @@
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.41'
+apply plugin: "java-library"
+apply plugin: "kotlin"
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+    test.java.srcDirs += 'src/test/kotlin'
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 
 group 'at.xa1.pullpub'
 version '0.0.1-TEST'
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-}
-
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    compile libs.kotlin
+    compile libs.ktor
+    testCompile libs.kotlinTest
+    testCompile libs.kotlinTestJUnit
 }
