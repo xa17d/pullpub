@@ -23,6 +23,7 @@ version '0.0.1-TEST'
 dependencies {
     compile libs.kotlin
     compile libs.ktor
+    implementation libs.ktorGson
     testCompile libs.kotlinTest
     testCompile libs.ktorServerTestHost
     testCompile libs.kotlinTestJUnit

@@ -12,6 +12,7 @@ class Server(
 
     fun startBlocking() {
         val server = embeddedServer(Netty, port = port) {
+            includeJson()
             adminModule("/admin", repository)
         }
         server.start(wait = true)

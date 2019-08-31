@@ -10,6 +10,7 @@ fun testServer(
     repository: MockRepository = MockRepository(),
     testBlock: TestServerContext.() -> Unit
 ) = withTestApplication({
+    includeJson()
     adminModule(adminPath, repository)
 }) {
     testBlock(TestServerContext(this, repository))
