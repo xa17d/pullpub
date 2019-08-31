@@ -10,7 +10,7 @@ import io.ktor.http.HttpStatusCode.Companion.OK
 
 suspend fun pullCommand(
     repository: Repository
-): DataResponse<String> =
+): DataResponse<PullResponse> =
     try {
         val pullResult = repository.pull()
 
@@ -25,7 +25,7 @@ suspend fun pullCommand(
                     "ALREADY_UP_TO_DATE",
                     "Pull successful, repository was already up to date"
                 )
-            }.status // TODO return object, not only status
+            }
         )
     } catch (e: RepositoryException) {
         // TODO log the error
@@ -34,7 +34,7 @@ suspend fun pullCommand(
             PullResponse(
                 "ERROR",
                 "Error during pull. Check logs."
-            ).status // TODO return object, not only status
+            )
         )
     }
 
