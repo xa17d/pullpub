@@ -23,11 +23,22 @@ version '0.0.1-TEST'
 dependencies {
     compile libs.kotlin
     compile libs.ktor
-    implementation libs.ktorGson
-    implementation libs.ktorHtml
-    implementation libs.coroutinesCore
+    compile libs.ktorGson
+    compile libs.ktorHtml
+    compile libs.coroutinesCore
     testCompile libs.kotlinTest
     testCompile libs.ktorServerTestHost
     testCompile libs.kotlinTestJUnit
     testImplementation libs.coroutinesTest
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'at.xa1.pullpub.server.MainKt'
+    }
+
+    // This line of code recursively collects and copies all of a project's files
+    // and adds them to the JAR itself. One can extend this task, to skip certain
+    // files or particular types at will
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
