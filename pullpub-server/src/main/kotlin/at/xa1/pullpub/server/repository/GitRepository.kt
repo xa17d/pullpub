@@ -22,6 +22,10 @@ class GitRepository(
 
     suspend fun clone(repoUrl: String): Unit = runWithoutResult("git", "clone", repoUrl, ".")
 
+    suspend fun isInitialized(): Boolean {
+        return shell.run("git", "status").exitCode == 0
+    }
+
     override suspend fun getActiveCommit(): Commit =
         runWithResult("git", "log", "--pretty=format:%h§§§%ad§§§%an§§§%ae§§§%s", "--max-count=1").let {
             val parts = it.output.split("§§§", limit = 5)

@@ -1,6 +1,7 @@
 package at.xa1.pullpub.server.admin
 
 import at.xa1.pullpub.server.logging.EventLogRepository
+import at.xa1.pullpub.server.logging.LogEntry
 import at.xa1.pullpub.server.repository.Commit
 import kotlinx.html.*
 
@@ -37,6 +38,10 @@ fun HTML.adminStatusPage(logRepository: EventLogRepository, activeCommit: Commit
                     
                     tr:nth-child(even) th {background-color: #aaaaaa;}
                     tr:nth-child(even) td {background-color: #f2f2f2;}
+                    
+                    .error {
+                        color: #ee0000;
+                    }
                     """.trimIndent()
                 )
             }
@@ -110,7 +115,15 @@ fun HTML.adminStatusPage(logRepository: EventLogRepository, activeCommit: Commit
                 logRepository.getLatest().forEach {
                     tr {
                         th { +it.tag }
-                        td { +it.message }
+                        td {
+                            +it.message
+                            if (it is LogEntry.Error && it.exception != null) {
+                                br()
+                                span(classes = "error") {
+                                    +it.exception.toString()
+                                }
+                            }
+                        }
                     }
                 }
             }
