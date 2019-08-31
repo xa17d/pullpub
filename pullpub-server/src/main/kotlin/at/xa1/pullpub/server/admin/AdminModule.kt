@@ -1,4 +1,4 @@
-package at.xa1.pullpub.server
+package at.xa1.pullpub.server.admin
 
 import io.ktor.application.Application
 import io.ktor.application.call

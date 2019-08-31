@@ -1,5 +1,6 @@
-package at.xa1.pullpub.server
+package at.xa1.pullpub.server.admin
 
+import at.xa1.pullpub.server.admin.adminModule
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.handleRequest
