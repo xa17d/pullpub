@@ -8,14 +8,14 @@ import io.ktor.server.netty.Netty
 
 class Server(
     private val port: Int,
+    private val adminPath: String,
     private val log: EventLogger,
     private val repository: Repository
 ) {
 
     fun startBlocking() {
         val server = embeddedServer(Netty, port = port) {
-            includeJson()
-            adminModule("/admin", log, repository)
+            addPullpubModules(adminPath, log, repository)
         }
         server.start(wait = true)
     }

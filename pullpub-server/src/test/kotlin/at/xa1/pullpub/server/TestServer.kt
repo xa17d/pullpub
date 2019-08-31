@@ -12,8 +12,7 @@ fun testServer(
     repository: MockRepository = MockRepository(),
     testBlock: TestServerContext.() -> Unit
 ) = withTestApplication({
-    includeJson()
-    adminModule(adminPath, log, repository)
+    addPullpubModules(adminPath, log, repository)
 }) {
     testBlock(TestServerContext(this, log, repository))
 }
