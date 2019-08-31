@@ -3,11 +3,21 @@ package at.xa1.pullpub.server.logging
 import java.util.LinkedList
 
 class InMemoryEventLogger(
-    private val maxCapacity: Int = 500
-) : EventLogger, Iterable<LogEntry> {
+    private val repository: InMemoryEventLogRepository
+) : EventLogger {
+    override fun error(tag: String, message: String, exception: Exception?) =
+        repository.addEntry(LogEntry.Error(tag, message, exception))
+
+    override fun info(tag: String, message: String) =
+        repository.addEntry(LogEntry.Info(tag, message))
+}
+
+class InMemoryEventLogRepository(
+    private val maxCapacity: Int
+) : EventLogRepository {
     private val entries = LinkedList<LogEntry>()
 
-    private fun addEntry(entry: LogEntry) {
+    fun addEntry(entry: LogEntry) {
         while (entries.size >= maxCapacity) {
             entries.removeLast()
         }
@@ -15,16 +25,13 @@ class InMemoryEventLogger(
         entries.addFirst(entry)
     }
 
-    override fun error(tag: String, message: String, exception: Exception?) =
-        addEntry(LogEntry.Error(tag, message, exception))
-
-    override fun info(tag: String, message: String) =
-        addEntry(LogEntry.Info(tag, message))
-
-    override fun iterator(): Iterator<LogEntry> = entries.iterator()
+    override fun getLatest(count: Int): Iterable<LogEntry> {
+        return entries.take(count)
+    }
 }
 
-sealed class LogEntry {
-    data class Error(val tag: String, val message: String, val exception: Exception?) : LogEntry()
-    data class Info(val tag: String, val message: String) : LogEntry()
+fun createInMemoryLogging(maxCapacity: Int = 500): Logging {
+    val repository = InMemoryEventLogRepository(maxCapacity)
+    val logger = InMemoryEventLogger(repository)
+    return Logging(logger, repository)
 }
