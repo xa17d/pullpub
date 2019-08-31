@@ -1,5 +1,7 @@
 package at.xa1.pullpub.server
 
+import at.xa1.pullpub.server.files.FileProvider
+import at.xa1.pullpub.server.files.MockFileProvider
 import at.xa1.pullpub.server.logging.InMemoryEventLogger
 import at.xa1.pullpub.server.logging.Logging
 import at.xa1.pullpub.server.logging.createInMemoryLogging
@@ -11,17 +13,19 @@ fun testServer(
     adminPath: String = "/admin",
     logging: Logging = createInMemoryLogging(),
     repository: MockRepository = MockRepository(),
+    fileProvider: MockFileProvider = MockFileProvider(),
     testBlock: TestServerContext.() -> Unit
 ) = withTestApplication({
-    addPullpubModules(adminPath, logging, repository)
+    addPullpubModules(adminPath, logging, repository, fileProvider)
 }) {
-    testBlock(TestServerContext(this, logging, repository))
+    testBlock(TestServerContext(this, logging, repository, fileProvider))
 }
 
 class TestServerContext(
     private val engine: TestApplicationEngine,
     val logging: Logging,
-    val repository: MockRepository
+    val repository: MockRepository,
+    val fileProvider: MockFileProvider
 ) {
     fun withRequest(
         method: HttpMethod,
