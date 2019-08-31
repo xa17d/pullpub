@@ -2,6 +2,7 @@ package at.xa1.pullpub.server.admin
 
 import at.xa1.pullpub.server.TestServerContext
 import at.xa1.pullpub.server.fromJson
+import at.xa1.pullpub.server.logging.LogEntry
 import at.xa1.pullpub.server.repository.PullResult
 import at.xa1.pullpub.server.testServer
 import io.ktor.http.HttpMethod.Companion.Get
@@ -12,6 +13,7 @@ import io.ktor.server.testing.TestApplicationCall
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class PullTest {
     @Test
@@ -36,6 +38,7 @@ class PullTest {
         whenPullRequest { contentJson ->
             assertEquals(OK, response.status())
             assertEquals("UPDATED", contentJson.status)
+            assertTrue(log.last() is LogEntry.Info)
         }
     }
 
@@ -46,6 +49,7 @@ class PullTest {
         whenPullRequest { contentJson ->
             assertEquals(OK, response.status())
             assertEquals("ALREADY_UP_TO_DATE", contentJson.status)
+            assertTrue(log.last() is LogEntry.Info)
         }
     }
 
@@ -56,6 +60,7 @@ class PullTest {
         whenPullRequest { contentJson ->
             assertEquals(InternalServerError, response.status())
             assertEquals("ERROR", contentJson.status)
+            assertTrue(log.last() is LogEntry.Error)
         }
     }
 }

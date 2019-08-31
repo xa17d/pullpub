@@ -1,5 +1,6 @@
 package at.xa1.pullpub.server.admin
 
+import at.xa1.pullpub.server.logging.EventLogger
 import at.xa1.pullpub.server.repository.Repository
 import at.xa1.pullpub.server.respondData
 import io.ktor.application.Application
@@ -13,6 +14,7 @@ import io.ktor.routing.routing
 
 fun Application.adminModule(
     path: String,
+    log: EventLogger,
     repository: Repository
 ) {
     routing {
@@ -23,7 +25,7 @@ fun Application.adminModule(
 
             post("pull") {
                 call.respondData(
-                    pullCommand(repository)
+                    pullCommand(log, repository)
                 )
             }
         }

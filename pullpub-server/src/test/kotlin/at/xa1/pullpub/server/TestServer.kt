@@ -1,23 +1,26 @@
 package at.xa1.pullpub.server
 
 import at.xa1.pullpub.server.admin.adminModule
+import at.xa1.pullpub.server.logging.InMemoryEventLogger
 import at.xa1.pullpub.server.repository.MockRepository
 import io.ktor.http.HttpMethod
 import io.ktor.server.testing.*
 
 fun testServer(
     adminPath: String = "/admin",
+    log: InMemoryEventLogger = InMemoryEventLogger(),
     repository: MockRepository = MockRepository(),
     testBlock: TestServerContext.() -> Unit
 ) = withTestApplication({
     includeJson()
-    adminModule(adminPath, repository)
+    adminModule(adminPath, log, repository)
 }) {
-    testBlock(TestServerContext(this, repository))
+    testBlock(TestServerContext(this, log, repository))
 }
 
 class TestServerContext(
     private val engine: TestApplicationEngine,
+    val log: InMemoryEventLogger,
     val repository: MockRepository
 ) {
     fun withRequest(
