@@ -12,6 +12,7 @@ enum class PullResult {
 
 data class Commit(
     val id: String,
+    val timestamp: String,
     val message: String,
     val author: String
 )

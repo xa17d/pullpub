@@ -6,6 +6,7 @@ class MockRepository : Repository {
 
     var activeCommit: Commit = Commit(
         "ID",
+        "2019-09-01 11:22:33",
         "Mocked commit message",
         "Mock Author"
     )
