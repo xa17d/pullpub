@@ -1,8 +1,9 @@
 buildscript {
     ext {
         versions = [
-                kotlin: '1.3.50',
-                ktor  : '1.2.3'
+                kotlin    : '1.3.50',
+                ktor      : '1.2.3',
+                coroutines: '1.3.0'
         ]
 
         libs = [
@@ -12,7 +13,9 @@ buildscript {
                 ktorHtml          : "io.ktor:ktor-html-builder:$versions.ktor",
                 ktorServerTestHost: "io.ktor:ktor-server-test-host:$versions.ktor",
                 kotlinTest        : "org.jetbrains.kotlin:kotlin-test:$versions.kotlin",
-                kotlinTestJUnit   : "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin"
+                kotlinTestJUnit   : "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin",
+                coroutinesCore    : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines",
+                coroutinesTest    : "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutines",
         ]
     }
 
