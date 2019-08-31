@@ -24,5 +24,6 @@ dependencies {
     compile libs.kotlin
     compile libs.ktor
     testCompile libs.kotlinTest
+    testCompile libs.ktorServerTestHost
     testCompile libs.kotlinTestJUnit
 }

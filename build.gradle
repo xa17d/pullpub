@@ -6,10 +6,11 @@ buildscript {
         ]
 
         libs = [
-                kotlin: "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin",
-                ktor  : "io.ktor:ktor-server-netty:$versions.ktor",
-                kotlinTest : "org.jetbrains.kotlin:kotlin-test:$versions.kotlin",
-                kotlinTestJUnit : "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin"
+                kotlin            : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin",
+                ktor              : "io.ktor:ktor-server-netty:$versions.ktor",
+                ktorServerTestHost: "io.ktor:ktor-server-test-host:$versions.ktor",
+                kotlinTest        : "org.jetbrains.kotlin:kotlin-test:$versions.kotlin",
+                kotlinTestJUnit   : "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin"
         ]
     }
 
