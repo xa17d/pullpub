@@ -5,7 +5,9 @@ import at.xa1.pullpub.server.logging.LogEntry
 import at.xa1.pullpub.server.repository.Commit
 import kotlinx.html.*
 
-fun HTML.adminStatusPage(logRepository: EventLogRepository, activeCommit: Commit) {
+// TODO retire html generation
+// TODO remove ktor-html dependency
+fun HTML.adminStatusPage(logRepository: EventLogRepository, activeCommit: Commit?) {
     head {
         style("text/css") {
             unsafe {
@@ -87,23 +89,27 @@ fun HTML.adminStatusPage(logRepository: EventLogRepository, activeCommit: Commit
         }
 
         h2 { +"Active Commit" }
-        div(classes = "round") {
-            table {
-                tr {
-                    th { +"ID" }
-                    td { +activeCommit.id }
-                }
-                tr {
-                    th { +"Timestamp" }
-                    td { +activeCommit.timestamp }
-                }
-                tr {
-                    th { +"Message" }
-                    td { +activeCommit.message }
-                }
-                tr {
-                    th { +"Author" }
-                    td { +activeCommit.author }
+        if (activeCommit == null) {
+            div(classes = "round error") { +"Error during retrieving active commit. Check logs." }
+        } else {
+            div(classes = "round") {
+                table {
+                    tr {
+                        th { +"ID" }
+                        td { +activeCommit.id }
+                    }
+                    tr {
+                        th { +"Timestamp" }
+                        td { +activeCommit.timestamp }
+                    }
+                    tr {
+                        th { +"Message" }
+                        td { +activeCommit.message }
+                    }
+                    tr {
+                        th { +"Author" }
+                        td { +activeCommit.author }
+                    }
                 }
             }
         }
