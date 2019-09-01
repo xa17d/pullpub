@@ -2,11 +2,12 @@ package at.xa1.pullpub.server.admin
 
 import at.xa1.pullpub.server.logging.Logging
 import at.xa1.pullpub.server.repository.Repository
-import at.xa1.pullpub.server.repository.RepositoryException
 import at.xa1.pullpub.server.respondData
 import io.ktor.application.Application
 import io.ktor.application.call
-import io.ktor.html.respondHtml
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
@@ -20,15 +21,11 @@ fun Application.adminModule(
     routing {
         route(path) {
             get {
-                val activeCommit =
-                    try {
-                        repository.getActiveCommit()
-                    } catch (e: RepositoryException) {
-                        logging.logger.error(LOG_TAG, "Cannot retrieve active commit", e)
-                        null
-                    }
-                call.respondHtml {
-                    adminStatusPage(logging.repository, activeCommit)
+                call.respondText(
+                    ContentType.parse("text/html"),
+                    HttpStatusCode.OK
+                ) {
+                    adminStatusPage()
                 }
             }
 

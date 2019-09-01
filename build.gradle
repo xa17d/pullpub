@@ -10,7 +10,6 @@ buildscript {
                 kotlin            : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin",
                 ktor              : "io.ktor:ktor-server-netty:$versions.ktor",
                 ktorGson          : "io.ktor:ktor-gson:$versions.ktor",
-                ktorHtml          : "io.ktor:ktor-html-builder:$versions.ktor",
                 ktorServerTestHost: "io.ktor:ktor-server-test-host:$versions.ktor",
                 kotlinTest        : "org.jetbrains.kotlin:kotlin-test:$versions.kotlin",
                 kotlinTestJUnit   : "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin",

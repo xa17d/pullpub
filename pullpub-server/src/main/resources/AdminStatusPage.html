@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>pullpub admin</title>
+    <style type="text/css">
+    body {
+      font-family: Arial;
+      background-color: #aaaaaa;
+    }
+
+    table {
+      border-collapse: collapse;
+    }
+
+    .round {
+      border-radius: 5px;
+      border: 1px solid #aaaaaa;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #999999;
+      color: #ffffff;
+    }
+
+    tr:nth-child(even) th {
+      background-color: #aaaaaa;
+    }
+
+    tr:nth-child(even) td {
+      background-color: #f2f2f2;
+    }
+
+    .error {
+      color: #ee0000;
+    }
+
+    .errormessage {
+      color: #ee0000;
+      font-style: italic;
+      font-size: 90%;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .rotate {
+      animation: spin 2s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+      }
+    }
+
+    #activeCommitError {
+      padding: 10px;
+    }
+
+    button {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #aaaaaa;
+      background-color: #f2f2f2;
+      font-size: 1.1em;
+    }
+
+    .page {
+      margin: 20px;
+      padding: 30px;
+      background-color: #ffffff;
+      max-width: 1000px;
+      display: inline-block;
+      text-align: left;
+    }
+
+    .page-wrapper {
+      text-align: center;
+    }
+  </style>
+    <script type="text/javascript">
+    /** Simple Promise **/
+    function SimplePromise() {
+      return {
+        // pending, success, error
+        status: "pending",
+        result: "",
+        handlers: [],
+        handle: function () {
+          const status = this.status
+          const result = this.result
+          if (status == "pending") {
+            // do nothing yet
+          } else if (status == "success") {
+            this.handlers.forEach(element => {
+              element.successHandler(result);
+              element.doneHandler(result);
+            });
+            this.handlers = [];
+          } else if (status == "error") {
+            this.handlers.forEach(element => {
+              element.errorHandler(result);
+              element.doneHandler(result);
+            });
+            this.handlers = [];
+          } else {
+            throw Error("unknown status type: " + status)
+          }
+        },
+        then: function (successHandler, errorHandler, doneHandler) {
+          if (successHandler === undefined) { successHandler = () => { }; }
+          if (errorHandler === undefined) { errorHandler = () => { }; }
+          if (doneHandler === undefined) { doneHandler = () => { }; }
+
+          this.handlers.push({
+            successHandler: successHandler,
+            errorHandler: errorHandler,
+            doneHandler: doneHandler
+          });
+          this.handle();
+        },
+        complete: function (status, result) {
+          if (this.status != "pending") {
+            throw Error("Promise already completed. Cannot completed twice");
+          }
+          this.result = result;
+          this.status = status;
+          this.handle();
+        },
+        completeWithSuccess: function (result) {
+          this.complete("success", result);
+        },
+        completeWithError: function (result) {
+          this.complete("error", result);
+        }
+      }
+    }
+    /***************/
+
+    /** Simple Rest **/
+    function convertToJson(responseText) {
+      try {
+        return JSON.parse(responseText);
+      } catch (err) {
+        return {
+          message: "Invalid JSON: \"" + responseText + "\"",
+          responseText: responseText,
+          error: err
+        }
+      }
+    }
+
+    function SimpleRest(baseUrl) {
+      return {
+        request: function (method, url) {
+          const xhttp = new XMLHttpRequest();
+          const promise = SimplePromise()
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4) {
+              if (this.status == 200) {
+                promise.completeWithSuccess(
+                  convertToJson(this.responseText)
+                )
+              } else {
+                promise.completeWithError(
+                  convertToJson(this.responseText)
+                )
+              }
+            }
+          };
+          xhttp.open(method, baseUrl + url, true);
+          xhttp.send();
+          return promise;
+        }
+      };
+    }
+    /***************/
+
+    /** SimpleHtmlElement **/
+    function SimpleHtmlElement(id) {
+      return {
+        getElement: function () {
+          return document.getElementById(id)
+        },
+        addClass: function (className) {
+          const e = this.getElement()
+          if (!e.classList.contains(className)) {
+            e.classList.add(className);
+          }
+        },
+        removeClass: function (className) {
+          const e = this.getElement()
+          if (e.classList.contains(className)) {
+            e.classList.remove(className);
+          }
+        },
+        show: function () {
+          this.removeClass("hidden");
+        },
+        hide: function () {
+          this.addClass("hidden");
+        },
+        setText: function (text) {
+          this.getElement().innerText = text;
+        },
+        setHtml: function (html) {
+          this.getElement().innerHTML = html;
+        }
+      };
+    }
+    /***************/
+
+    /** SimpleTable **/
+    function htmlEncode(text) {
+      const d = document.createElement('span');
+      d.textContent = text;
+      return d.innerHTML;
+    }
+
+    function TableHead(content) {
+      return {
+        type: "tableHead",
+        content: content
+      };
+    }
+    function TableHtml(html) {
+      return {
+        type: "tableHtml",
+        html: html
+      };
+    }
+    function SimpleTable() {
+      return {
+        html: "",
+        addRow: function () {
+          let html = "";
+          html += "<tr>";
+          for (let i = 0; i < arguments.length; i++) {
+            const arg = arguments[i];
+            let content;
+            let tag;
+            if (arg.type == "tableHead") {
+              tag = "th";
+              content = arg.content;
+            } else {
+              tag = "td";
+              content = arg;
+            }
+
+            if (content.type != "tableHtml") {
+              content = htmlEncode(content);
+            } else {
+              content = content.html;
+            }
+
+            html += "<" + tag + ">" + content + "</" + tag + ">";
+
+          }
+          html += "</tr>";
+          this.html += html;
+        },
+        getHtml: function () {
+          return "<table>" + this.html + "</table>";
+        }
+      };
+    }
+    /***************/
+
+    const rest = SimpleRest("./");
+
+    /** Components **/
+    const buttonPull = (() => {
+      const buttonPull = SimpleHtmlElement("buttonPull");
+      const buttonPullLoading = SimpleHtmlElement("buttonPullLoading");
+      const buttonPullDefault = SimpleHtmlElement("buttonPullDefault");
+      const buttonPullStatusSuccess = SimpleHtmlElement("buttonPullStatusSuccess");
+      const buttonPullStatusError = SimpleHtmlElement("buttonPullStatusError");
+
+      return {
+        default: function () {
+          buttonPullLoading.hide()
+          buttonPullDefault.show()
+          buttonPullStatusSuccess.hide()
+          buttonPullStatusError.hide()
+        },
+        loading: function () {
+          buttonPullLoading.show()
+          buttonPullDefault.hide()
+          buttonPullStatusSuccess.hide()
+          buttonPullStatusError.hide()
+        },
+        success: function () {
+          buttonPullLoading.hide()
+          buttonPullDefault.show()
+          buttonPullStatusSuccess.show()
+          buttonPullStatusError.hide()
+        },
+        error: function () {
+          buttonPullLoading.hide()
+          buttonPullDefault.show()
+          buttonPullStatusSuccess.hide()
+          buttonPullStatusError.show()
+        }
+      }
+    })();
+
+    const activeCommit = (() => {
+      const divError = SimpleHtmlElement("activeCommitError");
+      const divSuccess = SimpleHtmlElement("activeCommitSuccess");
+      const spanErrorMessage = SimpleHtmlElement("activeCommitErrorMessage");
+      const spanId = SimpleHtmlElement("activeCommitId");
+      const spanTimestamp = SimpleHtmlElement("activeCommitTimestamp");
+      const spanMessage = SimpleHtmlElement("activeCommitMessage");
+      const spanAuthor = SimpleHtmlElement("activeCommitAuthor");
+
+      return {
+        error: function (message) {
+          divSuccess.hide();
+          spanErrorMessage.setText(message);
+          divError.show();
+        },
+        show: function (activeCommit) {
+          divError.hide();
+          spanId.setText(activeCommit.id);
+          spanTimestamp.setText(activeCommit.timestamp);
+          spanMessage.setText(activeCommit.message);
+          spanAuthor.setText(activeCommit.author);
+          divSuccess.show();
+        }
+      }
+    })();
+
+    const logContent = (() => {
+      const divContent = SimpleHtmlElement("logContent");
+
+      return {
+        error: function (message) {
+          divContent.setText(message);
+        },
+        show: function (entries) {
+          const table = SimpleTable();
+
+          entries.forEach((entry) => {
+            let content = htmlEncode(entry.message);
+            if (entry.errorMessage != null) {
+              content += "<br />";
+              content += "<p class=\"errormessage\">" + htmlEncode(entry.errorMessage) + "</p>";
+            }
+
+            table.addRow(
+              TableHead(entry.tag),
+              TableHtml(content)
+            )
+          });
+
+          divContent.setHtml(table.getHtml());
+        }
+      }
+    })();
+
+    const buttonLogRefresh = (() => {
+      const buttonLogRefreshLoading = SimpleHtmlElement("buttonLogRefreshLoading");
+      const buttonLogRefreshIdle = SimpleHtmlElement("buttonLogRefreshIdle");
+
+      return {
+        idle: function () {
+          buttonLogRefreshLoading.hide();
+          buttonLogRefreshIdle.show();
+        },
+        loading: function () {
+          buttonLogRefreshLoading.show();
+          buttonLogRefreshIdle.hide();
+        }
+      }
+    })();
+
+    /** Logic **/
+
+    function refreshActiveCommit() {
+      rest.request("GET", "activecommit").then(
+        (response) => { activeCommit.show(response.activeCommit); },
+        (response) => { activeCommit.error(response.message); }
+      )
+    }
+
+    function refreshLog() {
+      buttonLogRefresh.loading()
+      rest.request("GET", "log").then(
+        (response) => { logContent.show(response.entries); },
+        (response) => { logContent.error(response.message); },
+        () => { buttonLogRefresh.idle() }
+      );
+    }
+
+    function refreshAll() {
+      refreshActiveCommit();
+      refreshLog();
+    }
+
+    function pull() {
+      buttonPull.loading()
+      rest.request("POST", "pull").then(
+        (r) => { buttonPull.success(); },
+        (r) => { buttonPull.error() },
+        (r) => { refreshAll(); }
+      )
+    }
+
+    const loaded = SimplePromise()
+    loaded.then(
+      () => {
+        refreshAll();
+        setInterval(
+          () => {
+            refreshAll();
+          },
+          10000
+        )
+      }
+    )
+  </script>
+</head>
+
+<body>
+<div class="page-wrapper">
+    <div class="page round">
+        <h1>pullpub</h1>
+        <button id="buttonPull" onclick="pull()">
+        <span id="buttonPullLoading" class="hidden">
+          <span class="rotate">↻</span> pulling...&nbsp;
+        </span>
+            <span id="buttonPullDefault">
+          ↓ pull!
+        </span>
+            <span id="buttonPullStatusSuccess" class="hidden">
+          &nbsp;✅
+        </span>
+            <span id="buttonPullStatusError" class="hidden">
+          &nbsp;⚠️
+        </span>
+        </button>
+        &nbsp;
+        <button id="buttonLogRefresh" onclick="refreshLog()">
+        <span id="buttonLogRefreshLoading" class="hidden">
+          <span class="rotate">↻</span>
+        </span>
+            <span id="buttonLogRefreshIdle">
+          ↻
+        </span>
+        </button>
+        <h2>Active Commit</h2>
+        <div class="round">
+            <div id="activeCommitError" class="hidden">
+                <span id="activeCommitErrorMessage" class="error">Error</span>
+            </div>
+            <div id="activeCommitSuccess" class="hidden">
+                <table>
+                    <tr>
+                        <th>ID</th>
+                        <td><span id="activeCommitId">ID</span></td>
+                    </tr>
+                    <tr>
+                        <th>Timestamp</th>
+                        <td><span id="activeCommitTimestamp">Timestamp</span></td>
+                    </tr>
+                    <tr>
+                        <th>Message</th>
+                        <td><span id="activeCommitMessage">Message</span></td>
+                    </tr>
+                    <tr>
+                        <th>Author</th>
+                        <td><span id="activeCommitAuthor">Author</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <h2>Log</h2>
+        <div class="round">
+            <div id="logContent">
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    loaded.completeWithSuccess();
+  </script>
+</body>
+
+</html>

@@ -24,7 +24,6 @@ dependencies {
     compile libs.kotlin
     compile libs.ktor
     compile libs.ktorGson
-    compile libs.ktorHtml
     compile libs.coroutinesCore
     testCompile libs.kotlinTest
     testCompile libs.ktorServerTestHost
