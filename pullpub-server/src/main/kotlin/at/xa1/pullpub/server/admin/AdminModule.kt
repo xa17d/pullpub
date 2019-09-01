@@ -37,6 +37,10 @@ fun Application.adminModule(
                     pullCommand(logging.logger, repository)
                 )
             }
+
+            get("activecommit") {
+                call.respondData(getActiveCommit(repository, logging.logger))
+            }
         }
     }
 }

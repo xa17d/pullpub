@@ -10,6 +10,7 @@ class MockRepository : Repository {
         "Mocked commit message",
         "Mock Author"
     )
+    var activeCommitThrows = false
 
     override suspend fun pull(): PullResult {
         if (pullThrows) {
@@ -18,5 +19,10 @@ class MockRepository : Repository {
         return pullResult
     }
 
-    override suspend fun getActiveCommit(): Commit = activeCommit
+    override suspend fun getActiveCommit(): Commit {
+        if (activeCommitThrows) {
+            throw RepositoryException("pullThrows is set to true")
+        }
+        return activeCommit
+    }
 }
