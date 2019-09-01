@@ -1,3 +1,4 @@
 rootProject.name = 'pullpub'
 
-include ':pullpub-server'
+include ':pullpub-server',
+        ':pullpub-docker'

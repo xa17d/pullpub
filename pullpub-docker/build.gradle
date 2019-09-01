@@ -1,0 +1,30 @@
+import java.nio.file.CopyOption
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+
+tasks.register("createDockerImage") {
+    def jarOutputFolder = rootProject.file("pullpub-server/build/libs")
+    def jars = jarOutputFolder.listFiles().findAll { it.name.endsWith(".jar") }
+    if (jars.size() != 1) {
+        throw GradleException(
+                "Excpected exactly one .jar file in ${jarOutputFolder}, but found ${jars.size()}\n" +
+                "Note: extension has to be in lowercase")
+    }
+    def jar = jars.first()
+
+    def dockerBin = project.file("build/dockerbin")
+    dockerBin.mkdirs()
+
+    Files.copy(
+            Paths.get(jar.absolutePath),
+            Paths.get(dockerBin.absolutePath, "server.jar"),
+            StandardCopyOption.REPLACE_EXISTING
+    )
+
+    //commandLine 'createDockerImage.sh'
+}
+
+afterEvaluate {
+    //getTasksByName("createDockerImage").dependsOn(":pullpub-server:jar")
+}
