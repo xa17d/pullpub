@@ -9,7 +9,8 @@ interface Repository {
 
 enum class PullResult {
     Updated,
-    AlreadyUpToDate
+    AlreadyUpToDate,
+    ForcePulled
 }
 
 data class Commit(
@@ -19,4 +20,4 @@ data class Commit(
     val author: String
 )
 
-class RepositoryException(message: String, cause: Throwable? = null) : Exception(message, cause)
+open class RepositoryException(message: String, cause: Throwable? = null) : Exception(message, cause)

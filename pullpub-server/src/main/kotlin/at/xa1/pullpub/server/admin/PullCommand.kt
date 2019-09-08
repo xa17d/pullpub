@@ -2,8 +2,7 @@ package at.xa1.pullpub.server.admin
 
 import at.xa1.pullpub.server.DataResponse
 import at.xa1.pullpub.server.logging.EventLogger
-import at.xa1.pullpub.server.repository.PullResult.AlreadyUpToDate
-import at.xa1.pullpub.server.repository.PullResult.Updated
+import at.xa1.pullpub.server.repository.PullResult.*
 import at.xa1.pullpub.server.repository.Repository
 import at.xa1.pullpub.server.repository.RepositoryException
 import io.ktor.http.HttpStatusCode.Companion.InternalServerError
@@ -22,6 +21,10 @@ suspend fun pullCommand(
                 Updated -> PullResponse(
                     "UPDATED",
                     "Pull successful and repository was updated"
+                )
+                ForcePulled -> PullResponse(
+                    "UPDATED",
+                    "Had to force pull and repository was updated"
                 )
                 AlreadyUpToDate -> PullResponse(
                     "ALREADY_UP_TO_DATE",

@@ -2,6 +2,7 @@ package at.xa1.pullpub.server.repository
 
 import at.xa1.pullpub.server.repository.PullResult.AlreadyUpToDate
 import at.xa1.pullpub.server.repository.PullResult.Updated
+import at.xa1.pullpub.server.repository.PullResult.ForcePulled
 import at.xa1.shell.Shell
 import at.xa1.shell.ShellResult
 
@@ -11,7 +12,10 @@ class GitRepository(
     private suspend fun runWithResult(vararg command: String): ShellResult {
         val result = shell.run(*command)
         if (result.exitCode != 0) {
-            throw RepositoryException("Shell Error: " + result.output.trim())
+            throw RepositoryShellException(
+                "Shell Error: " + result.output.trim(),
+                result.output
+            )
         }
         return result
     }
@@ -47,11 +51,39 @@ class GitRepository(
         }
 
     override suspend fun pull(): PullResult {
-        val result = runWithResult("git", "pull")
-        return if (result.output.contains("Already up to date", ignoreCase = true)) {
-            AlreadyUpToDate
-        } else {
-            Updated
+        try {
+            val result = runWithResult("git", "pull")
+            return if (result.output.contains("Already up to date", ignoreCase = true)) {
+                AlreadyUpToDate
+            } else {
+                Updated
+            }
+        } catch (e: RepositoryShellException) {
+            /**
+             * A pull after a force update looks like this:
+             * ```
+             * From https://github.com/xa17d/pullpub-website-example
+             * + c577dd4...c10e00f master     -> origin/master  (forced update)
+             * ```
+             * -> requires a force pull
+             */
+            if (e.output.contains("forced update", ignoreCase = true)) {
+                forcePull(getBranchName())
+                return ForcePulled
+            } else {
+                throw e
+            }
         }
     }
+
+    private suspend fun forcePull(branchName: String) {
+        runWithoutResult("git", "fetch", "origin/$branchName")
+        runWithoutResult("git", "reset", "--hard", "origin/$branchName")
+    }
 }
+
+class RepositoryShellException(
+    message: String,
+    val output: String,
+    cause: Throwable? = null
+) : RepositoryException(message, cause)
