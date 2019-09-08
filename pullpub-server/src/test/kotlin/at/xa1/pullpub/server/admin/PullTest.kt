@@ -44,17 +44,6 @@ class PullTest {
     }
 
     @Test
-    fun `if pull updated repository by forcePull, response has status UPDATED_FORCED`() = testServer {
-        repository.pullResult = PullResult.ForcePulled
-
-        whenPullRequest { contentJson ->
-            assertEquals(OK, response.status())
-            assertEquals("UPDATED", contentJson.status)
-            assertTrue(logging.repository.last() is LogEntry.Info)
-        }
-    }
-
-    @Test
     fun `if on pull repository is alreadyUpToDate, response has status ALREADY_UP_TO_DATE`() = testServer {
         repository.pullResult = PullResult.AlreadyUpToDate
 

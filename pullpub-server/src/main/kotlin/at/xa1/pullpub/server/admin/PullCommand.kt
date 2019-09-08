@@ -22,10 +22,6 @@ suspend fun pullCommand(
                     "UPDATED",
                     "Pull successful and repository was updated"
                 )
-                ForcePulled -> PullResponse(
-                    "UPDATED",
-                    "Had to force pull and repository was updated"
-                )
                 AlreadyUpToDate -> PullResponse(
                     "ALREADY_UP_TO_DATE",
                     "Pull successful, repository was already up to date"

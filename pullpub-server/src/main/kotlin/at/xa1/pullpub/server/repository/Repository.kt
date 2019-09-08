@@ -9,8 +9,7 @@ interface Repository {
 
 enum class PullResult {
     Updated,
-    AlreadyUpToDate,
-    ForcePulled
+    AlreadyUpToDate
 }
 
 data class Commit(
