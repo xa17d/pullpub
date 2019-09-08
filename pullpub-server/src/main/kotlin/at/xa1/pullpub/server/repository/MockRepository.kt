@@ -12,6 +12,8 @@ class MockRepository : Repository {
     )
     var activeCommitThrows = false
 
+    var activeBranch: String = "MockBranch"
+
     override suspend fun pull(): PullResult {
         if (pullThrows) {
             throw RepositoryException("pullThrows is set to true")
@@ -24,5 +26,11 @@ class MockRepository : Repository {
             throw RepositoryException("pullThrows is set to true")
         }
         return activeCommit
+    }
+
+    override suspend fun getBranchName(): String = activeBranch
+
+    override suspend fun checkout(branchName: String) {
+        activeBranch = branchName
     }
 }

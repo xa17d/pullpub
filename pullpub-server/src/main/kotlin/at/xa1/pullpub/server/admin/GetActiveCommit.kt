@@ -11,19 +11,21 @@ import io.ktor.http.HttpStatusCode.Companion.OK
 suspend fun getActiveCommit(repository: Repository, logger: EventLogger): DataResponse<ActiveCommitResponse> =
     try {
         val commit = repository.getActiveCommit()
-        DataResponse(OK, ActiveCommitResponse(null, commit))
+        val branchName = repository.getBranchName()
+        DataResponse(OK, ActiveCommitResponse(null, commit, branchName))
     } catch (e: RepositoryException) {
         logger.error(LOG_TAG, "Cannot retrieve active commit", e)
 
         DataResponse(
             InternalServerError,
-            ActiveCommitResponse("Error while retrieving active commit. Check logs.", null)
+            ActiveCommitResponse("Error while retrieving active commit. Check logs.")
         )
     }
 
 data class ActiveCommitResponse(
     val message: String?,
-    val activeCommit: Commit?
+    val activeCommit: Commit? = null,
+    val activeBranch: String? = null
 )
 
 private const val LOG_TAG = "GetActiveCommit"

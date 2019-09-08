@@ -22,6 +22,15 @@ class GitRepository(
 
     suspend fun clone(repoUrl: String): Unit = runWithoutResult("git", "clone", repoUrl, ".")
 
+    override suspend fun checkout(branchName: String) {
+        runWithResult("git", "checkout", branchName)
+    }
+
+    override suspend fun getBranchName(): String {
+        val result = runWithResult("git", "symbolic-ref", "--short", "HEAD")
+        return result.output.trim()
+    }
+
     suspend fun isInitialized(): Boolean {
         return shell.run("git", "status").exitCode == 0
     }

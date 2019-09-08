@@ -3,6 +3,8 @@ package at.xa1.pullpub.server.repository
 interface Repository {
     suspend fun pull(): PullResult
     suspend fun getActiveCommit(): Commit
+    suspend fun checkout(branchName: String)
+    suspend fun getBranchName(): String
 }
 
 enum class PullResult {

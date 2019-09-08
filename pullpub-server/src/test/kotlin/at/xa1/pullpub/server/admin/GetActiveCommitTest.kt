@@ -20,12 +20,14 @@ class GetActiveCommitTest {
             author = "TestAuthor"
         )
         repository.activeCommit = testCommit
+        repository.activeBranch = "TestBranch"
         withRequest(HttpMethod.Get, "/admin/activecommit") {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals(
                 ActiveCommitResponse(
                     null,
-                    testCommit
+                    testCommit,
+                    "TestBranch"
                 )
                 , response.fromJson()
             )

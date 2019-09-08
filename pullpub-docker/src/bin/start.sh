@@ -24,21 +24,14 @@ copyConfig "id_rsa.pub" "/root/.ssh/id_rsa.pub"
 copyConfig "git-credentials" "/root/.git-credentials"
 
 ##
-## Clone repo
+## Get repo details
 ##
 git config --global credential.helper store
 
 REPO_URL=$(cat $ACTIVE_CONFIG/git-repository)
-echo "Cloning repository $REPO_URL..."
-git clone "$REPO_URL" repository
-cd repository
-
 REPO_BRANCH=$(cat $ACTIVE_CONFIG/git-branch)
-echo "Checkout branch $REPO_BRANCH..."
-git checkout "$REPO_BRANCH"
-cd ..
 ##
 ## Run
 ##
 echo "Starting server..."
-java -jar bin/server.jar 80 /admin /app/repository wwwroot "$REPO_URL"
+java -jar bin/server.jar 80 /admin /app/repository webroot "$REPO_URL" "$REPO_BRANCH"

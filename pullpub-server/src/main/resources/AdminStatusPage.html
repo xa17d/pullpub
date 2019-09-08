@@ -325,6 +325,7 @@
       const spanTimestamp = SimpleHtmlElement("activeCommitTimestamp");
       const spanMessage = SimpleHtmlElement("activeCommitMessage");
       const spanAuthor = SimpleHtmlElement("activeCommitAuthor");
+      const spanBranch = SimpleHtmlElement("activeCommitBranch");
 
       return {
         error: function (message) {
@@ -332,12 +333,13 @@
           spanErrorMessage.setText(message);
           divError.show();
         },
-        show: function (activeCommit) {
+        show: function (activeCommit, branchName) {
           divError.hide();
           spanId.setText(activeCommit.id);
           spanTimestamp.setText(activeCommit.timestamp);
           spanMessage.setText(activeCommit.message);
           spanAuthor.setText(activeCommit.author);
+          spanBranch.setText(branchName);
           divSuccess.show();
         }
       }
@@ -391,7 +393,7 @@
 
     function refreshActiveCommit() {
       rest.request("GET", "activecommit").then(
-        (response) => { activeCommit.show(response.activeCommit); },
+        (response) => { activeCommit.show(response.activeCommit, response.activeBranch); },
         (response) => { activeCommit.error(response.message); }
       )
     }
@@ -483,6 +485,10 @@
                     <tr>
                         <th>Author</th>
                         <td><span id="activeCommitAuthor">Author</span></td>
+                    </tr>
+                    <tr>
+                        <th>Branch</th>
+                        <td><span id="activeCommitBranch">Branch</span></td>
                     </tr>
                 </table>
             </div>
