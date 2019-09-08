@@ -31,8 +31,10 @@ git config --global credential.helper store
 REPO_URL=$(cat $ACTIVE_CONFIG/git-repository)
 REPO_BRANCH=$(cat $ACTIVE_CONFIG/git-branch)
 mkdir -p /app/repository
+
+ADMIN_PATH=$(cat $ACTIVE_CONFIG/admin-path)
 ##
 ## Run
 ##
 echo "Starting server..."
-java -jar bin/server.jar 80 /admin /app/repository webroot "$REPO_URL" "$REPO_BRANCH"
+java -jar bin/server.jar 80 "$ADMIN_PATH" /app/repository webroot "$REPO_URL" "$REPO_BRANCH"

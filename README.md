@@ -23,6 +23,8 @@ cd pullpub-docker/test/
 `run_and_connect.sh` will create a new Container, mount `pullpub-docker/test/config` into `/app/config`.
 Port `80` from Docker is mapped to `8080` on the host.
 
+The admin panel can be accessed via `http://localhost:8080/admin/`.
+
 ## Run unit tests
 ```bash#
 ./gradlew test
@@ -37,6 +39,10 @@ The config folder can contain following files:
 * **REQUIRED:** `git-repository`: contains the path to the git repository containing the website. E.g.:
     ```
     https://github.com/xa17d/pullpub-website-example.git
+    ```
+* **REQUIRED:** `admin-path`: Path to the admin interface. Use a long and random string, because it basically serves as password. E.g.:
+    ```
+    91c43c04-07d5-4c78-a0c9-3965f048f417
     ```
 * `git-branch`: contains the name of the branch to checkout. E.g.:
     ```
