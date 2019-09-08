@@ -30,6 +30,7 @@ git config --global credential.helper store
 
 REPO_URL=$(cat $ACTIVE_CONFIG/git-repository)
 REPO_BRANCH=$(cat $ACTIVE_CONFIG/git-branch)
+mkdir -p /app/repository
 ##
 ## Run
 ##
